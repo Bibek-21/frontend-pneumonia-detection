@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Spinner from "../spinner";
-// import HomeHeader from "../assets/Pneumonia.jpg";
+import heroImage from "../assets/image.jpg";
 
 const UploadPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [result, setResult] = useState("");
-  // const [ setPneumoniaState] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSelected, setIsSelected] = useState(null);
+  const [showUpload, setShowUpload] = useState(true);
 
   const handleFileChange = (event) => {
+    setIsSelected(true);
     setImagePreview(null);
     setResult("");
-    // setPneumoniaState("");
-
     const file = event.target.files[0];
     setSelectedFile(file);
     const reader = new FileReader();
@@ -24,16 +24,11 @@ const UploadPage = () => {
     };
     reader.readAsDataURL(file);
   };
-
-  //Call API to detect Pneumonia and set the state as the result
-  // const handlePneumoniaDetection = () => {
-  //   setLoading(true);
-  //   // setPneumoniaState("Pneumonia Detected");
-  //   setTimeout(() => setLoading(false), 2000);
-  // };
-
-  //Call API to process image and set the state as the result
   const handleDetectClick = () => {
+    if (!selectedFile) {
+      setIsSelected(false);
+      return;
+    }
     setLoading(true);
     if (!selectedFile) {
       console.error("No file selected.");
@@ -49,6 +44,7 @@ const UploadPage = () => {
         setLoading(false);
         console.log(response.data);
         setResult(response.data?.data);
+        setShowUpload(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -57,99 +53,130 @@ const UploadPage = () => {
       });
   };
 
-  console.log({ result });
-
   return (
     <>
-      {/* <Spinner /> */}
       {loading ? (
         <Spinner />
       ) : (
         <div>
-          <h1 className="text-center mt-2 text-uppercase">
-            Upload Image for Pneumonia Detection
-          </h1>
-          <div className="d-flex flex-column align-items-center mt-5">
-            <div>
-              {/* File upload input */}
-              <input type="file" onChange={handleFileChange} />
-            </div>
-
-            {/* Image preview */}
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                style={{ width: "200px", height: "200px" }}
-                className="img-thumbnail"
-              />
-            )}
-
-            {/* <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div> */}
-            {/* Process Image button */}
-            <button
-              type="button"
-              className="btn btn-success mt-3"
-              onClick={handleDetectClick}
-            >
-              Process Image
-            </button>
-            {result.length ? (
+          {result.length ? (
+            result === "Pneumonia Detected" ? (
               <>
-                <>
-                  <h3 className="mt-4">Result:</h3>
-                  <p>{result}</p>
-                </>
+                <div className="d-flex justify-content-center flex-column align-items-center">
+                  <h1 className="text-center mt-2 mb-5 text-uppercase text-primary">
+                    Result of Pneumonia Detection
+                  </h1>
+                  <img src={heroImage} alt="Hero" style={{ width: "50rem" }} />
+                </div>
+                {imagePreview && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      margin: "0 200px",
+                    }}
+                    className="text-primary"
+                  >
+                    <div>
+                      <h5>Selected Xray:</h5>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        style={{ width: "200px", height: "200px" }}
+                        className="img-thumbnail"
+                      />
+                    </div>
+                    <h3 className="mt-5">
+                      Result:
+                      <p>{result}</p>
+                    </h3>
+                  </div>
+                )}
               </>
             ) : (
-              <></>
-            )}
-
-            {error ? (
               <>
-                <p>{error}</p>
+                <div className="d-flex justify-content-center flex-column align-items-center">
+                  <h1 className="text-center mt-2 mb-5 text-uppercase text-success">
+                    Result of Pneumonia Detection
+                  </h1>
+                  <img src={heroImage} alt="Hero" style={{ width: "50rem" }} />
+                </div>
+                {imagePreview && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-around",
+                      margin: "0 200px",
+                    }}
+                    className="text-success"
+                  >
+                    <div>
+                      <h5>Selected Xray:</h5>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        style={{ width: "200px", height: "200px" }}
+                        className="img-thumbnail"
+                      />
+                    </div>
+                    <h3 className="mt-5">
+                      Result:
+                      <p>{result.data ? result.data : "Not Detected"}</p>
+                    </h3>
+                  </div>
+                )}
               </>
-            ) : (
-              <></>
-            )}
-          </div>
-          {/* <div className="col">
-            <img src={HomeHeader} alt="Home Header" className="img-fluid" />
-          </div> */}
+            )
+          ) : (
+            <>
+              <h1 className="text-center mt-2 text-uppercase">
+                Upload Image for Pneumonia Detection
+              </h1>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img src={heroImage} alt="Hero" style={{ width: "50rem" }} />
+              </div>
+              <div className="image-upload">
+                <div className="d-flex flex-column align-items-center mt-5">
+                  {showUpload && (
+                    <div>
+                      <input type="file" onChange={handleFileChange} />
+                    </div>
+                  )}
+                  {showUpload && (
+                    <button
+                      type="button"
+                      className="btn btn-success mt-3"
+                      onClick={handleDetectClick}
+                    >
+                      SUBMIT
+                    </button>
+                  )}
+                  {!showUpload && <h5> </h5>}
+                  {selectedFile && !isSelected && (
+                    <h5>Please select an Image</h5>
+                  )}
+                  {imagePreview && (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{ width: "200px", height: "200px" }}
+                      className="img-thumbnail"
+                    />
+                  )}
+                  {error ? <p>{error}</p> : <></>}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
-
-    // <div className="row">
-    //   <div className="col d-flex flex-column justify-content-center">
-    // {/* File upload input */}
-    // <input type="file" onChange={handleFileChange} />
-
-    // {/* Image preview */}
-    // {imagePreview && (
-    //   <img
-    //     src={imagePreview}
-    //     alt="Preview"
-    //     style={{ width: "200px", height: "200px" }}
-    //     className="img-thumbnail"
-    //   />
-    // )}
-    //   </div>
-
-    //   <div className="col">
-    // {/* Detect button */}
-    // <button
-    //   type="button"
-    //   className="btn btn-success"
-    //   onClick={handleDetectClick}
-    // >
-    //   Detect Pneumonia
-    // </button>
-    // {result ? <p>{result.message}</p> : <></>}
-    //   </div>
-    // </div>
   );
 };
 
